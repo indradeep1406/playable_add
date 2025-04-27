@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cricket Champions</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    max-height: 700px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.screen.active {
+    transform: translateX(0);
+}
+
+.top-right-logo {
+    display: none;
+}
+
+/* #intro-screen styles removed as the element is gone */
+
+.logo-image {
+    width: 100%;
+    height: 100%;
+    background-color: #3182ce;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.background-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+h1 { /* Still used for other headings potentially */
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+/* .tagline styles removed as the element is gone */
+
+.btn {
+    background-color: #f6e05e;
+    color: #000;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn:hover {
+    background-color: #ecc94b;
+}
+
+.btn-icon {
+    font-size: 24px;
+}
+
+#tutorial-screen {
+    background: url('https://media-hosting.imagekit.io/72ec4bcb09aa4773/1008x1008.jpg?Expires=1838086276&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SQYvTFaPXDvwMvVggWADBw-ThQTmbjXlPRJXUFpgcV4RU-KfOVPZP~RpAwzt9Wn6VBq5QGzibeQrLQqG5Gg6h67CtRbljgYhn7I8xjN4xuGmCWrTrkmvGRz-FYpH1SXwPfIaKVkBmX9PiF3SmeKgfMCHqczI7Du6~TCCUUl3aU1kyaiqmAg27j4PWJs9RqJTznXFiqPhJY7p3ndjQ7khP7CVHzhyEgWLAc~WJT7qRwelr-XGNr3SKO-jdXZ6F7KihiFz6OnCsvknPOZssyU5IWBPnyWeieq8O1hHU7dBmeLm~LomfQIXe6sujYjZddD5hdwRg-ycZZvAUrfBwfIPYw__');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.close-btn { /* Style for all close buttons */
+    position: absolute;
+    top: -1%;
+    right: -50%;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 2; /* Ensure button is above other content */
+}
+
+.tutorial-title {
+    font-size: 24px;
+    text-align: center;
+    margin: 30px 0 20px;
+}
+
+.tutorial-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.instruction-box {
+    background-color: #1a4580;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.instruction-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.instruction-list {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+#gameplay-screen {
+    background: url('https://media-hosting.imagekit.io/fc34ec67e35441c6/BG_Match.jpg?Expires=1838089076&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ppi8PhjOKJ8LiYoZ4Pr-s4yzX-AZXNevcFn9RLAaubVUMMjhxHXDTGVA9wo0hykfXg0AWUvp0LgtXnS97ELobBdFdBL1UfnTCrDkBrSva6dccje2HBSU4YuKbdlAc6I0~WSAtopPXKLOyYKuYo1VOgkjRwS4y~F84JGUcUykOmf~5xLNesz5ZOKJhv5Kn~W3io7XEsgA-c5JasqqhyoqANIhh0MRALuQCimvP1AisWEabuqmc2Ssb43hnLZ1WFXTMvEinpVCrlza7hFsB3ctQBgTaMu1EuK4Oz5TH7Gssuu~5tZX12AaLgXo14bOcx-pSHwFYrBrdOYxbrdzqJtIBw__');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-bar {
+    padding: 10px;
+    background-color: #1a4580;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-value {
+    background-color: #2b6cb0;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.pitch-area {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('https://media-hosting.imagekit.io/583b9f38c87c4bb4/Match_PitchGreen.png?Expires=1838089101&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=ebDY~v2~I4RXnMPZ9yrvaGXHBYFg~CLHmEwv~UeMs-hmcHbmRvxe8EtvI41SkLCgL2H8OlCb64WgqvABz5sweyFoglxhtcpToahoufR2cdAx3lIUa8jEqz-8GfsagcYPLqGKS9JB1~HBm39yUl4doJSnZPzI6Z~0hPTTJUZgG2XcoCjTwbYompAYwL7l0iIgwC9jkMSxtZD2nuiL32lnY9vBqBq1MRkTYeiZJNMY13Z8SaocRq8FXIaiJ2MDge~X4LEBRFdZe3ZbJJheC--odk4N3afJvj4EVQZ2-gOqrgbeXSXFFC0maPw-VAblsaFgP~bM3CynrsAaJK8uNQLaXQ__');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bowling-card-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.bowling-card-title {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.bowling-card {
+    width: 140px;
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.card {
+    width: calc(100% / 6);
+    height: 160px;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+}
+
+.animation-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.animation-text {
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.batting-cards-area {
+    padding: 0;
+    background-color: #1a4580;
+}
+
+.batting-cards-title {
+    color: white;
+    text-align: center;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.batting-cards-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+}
+
+#result-screen {
+    background: url('https://media-hosting.imagekit.io/72ec4bcb09aa4773/1008x1008.jpg?Expires=1838086276&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=SQYvTFaPXDvwMvVggWADBw-ThQTmbjXlPRJXUFpgcV4RU-KfOVPZP~RpAwzt9Wn6VBq5QGzibeQrLQqG5Gg6h67CtRbljgYhn7I8xjN4xuGmCWrTrkmvGRz-FYpH1SXwPfIaKVkBmX9PiF3SmeKgfMCHqczI7Du6~TCCUUl3aU1kyaiqmAg27j4PWJs9RqJTznXFiqPhJY7p3ndjQ7khP7CVHzhyEgWLAc~WJT7qRwelr-XGNr3SKO-jdXZ6F7KihiFz6OnCsvknPOZssyU5IWBPnyWeieq8O1hHU7dBmeLm~LomfQIXe6sujYjZddD5hdwRg-ycZZvAUrfBwfIPYw__');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+}
+
+#result-screen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark overlay */
+    z-index: 0;
+}
+
+#result-screen > * {
+    position: relative; /* Ensure content is above the overlay */
+    z-index: 1;
+}
+
+.result-title {
+    font-size: 32px;
+    margin-top: 80px;
+    margin-bottom: 10px;
+    font-family: 'Arial Black', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    letter-spacing: -1.5px;
+}
+
+.cricket-star {
+    display: none;
+}
+
+.result-subtitle {
+    font-size: 28px;
+    color: #FFA500;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.result-box {
+    background-color: transparent;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 320px;
+}
+
+.result-message {
+    font-size: 22px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.feature-list {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.feature-icon {
+    background-color: #FFA500;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.download-button {
+    background-color: #FFA500;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.playstore-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+}
+</style>
+</head>
+<body>
+<div id="game-container">
+
+<!-- <<< Intro Screen HTML Block Removed >>> -->
+
+<!-- <<< Added 'active' class here to make tutorial the starting screen >>> -->
+<div id="tutorial-screen" class="screen active">
+    <div class="background-image"></div>
+    <button id="skip-tutorial-btn" class="close-btn">✕</button> <!-- Existing close button for tutorial -->
+    <h2 class="tutorial-title">How to Play</h2>
+
+    <div class="tutorial-content">
+        <div class="instruction-box">
+            <h3 class="instruction-title">1. The Objective</h3>
+            <p>Prevent opponent from scoring 9 runs in 3 balls by choosing the right bowling cards.</p>
+        </div>
+
+        <div class="instruction-box">
+            <h3 class="instruction-title">2. Playing Cards</h3>
+            <p>Each ball, your opponent will try a batting shot. Choose the best bowling delivery to counter it!</p>
+        </div>
+
+        <div class="instruction-box">
+            <h3 class="instruction-title">3. Scoring</h3>
+            <p>Different combinations of batting and bowling cards result in different outcomes. Try to get your opponent out!</p>
+            <ul class="instruction-list">
+                <li>Great bowling: Out or 0 runs</li>
+                <li>Good bowling: 1-2 runs</li>
+                <li>Poor bowling: 4-6 runs</li>
+            </ul>
+        </div>
+    </div>
+
+    <button id="start-game-btn" class="btn">
+        Start Game
+    </button>
+</div>
+
+
+<div id="gameplay-screen" class="screen">
+    <div class="background-image"></div>
+    <div class="stats-bar">
+        <div class="stat">
+            <span>Target:</span>
+            <span id="target-value" class="stat-value">9</span>
+        </div>
+        <div class="stat">
+            <span>Score:</span>
+            <span id="score-value" class="stat-value">0</span>
+        </div>
+        <div class="stat">
+            <span>Balls:</span>
+            <span id="balls-value" class="stat-value">3</span>
+        </div>
+    </div>
+    <div class="pitch-area">
+        <div id="animation-overlay" class="animation-overlay">
+            <div id="animation-text" class="animation-text"></div>
+        </div>
+
+        <div class="bowling-card-container">
+            <h3 class="bowling-card-title">Opponent's Shot</h3>
+            <div id="bowling-card" class="card bowling-card"></div>
+        </div>
+    </div>
+
+    <div class="batting-cards-area">
+        <h3 class="batting-cards-title">Your Bowling Cards</h3>
+        <div id="batting-cards-container" class="batting-cards-container">
+        </div>
+    </div>
+</div>
+
+
+<div id="result-screen" class="screen">
+    <button id="close-ad-btn" class="close-btn">✕</button>
+    <div class="background-image"></div>
+    <h2 class="result-title">CRICKET CHAMPIONS</h2>
+    <p class="result-subtitle">Master the Cricket Cards!</p>
+
+    <div class="result-box">
+        <p id="result-message" class="result-message">
+            OUT! You scored 0 runs. Download to continue your innings!
+        </p>
+        <div class="feature-list">
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>Collect and upgrade new cards</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>Build your dream cricket team</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✓</div>
+                <span>Compete in tournaments</span>
+            </div>
+        </div>
+
+        <button id="download-btn" class="download-button">
+            <img src="https://media-hosting.imagekit.io/d4ad5018c0464a5e/download.png?Expires=1838095309&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=nzx5ZCbZoxgtBDdeVoi6TOGRFdxGS3~vi--oMkWOOVgyX8jlQAfd12aTWlQrkP8AMaZgCJXowZcQ7Ro9fo9HP~WmE6qVeTl~pamskcZYjkgeFgUWp1d170AH8tKss61DG5s058R5zlF8v9Q636cK-6BjIZXw2AV2zCwCiSEETHTmzkzhCqwEUXpbYwKK2c5U5Js4rN5pR8oUcc6UVQ-a4eZVka-13951VEt-2Y3Aze0oFh1jHBQ6s9S7EyB9srWdTQhOGrAWm~JGnzjy9JBPfEomrCFqF7SZkM1nZjXpCZojv-vYCcm-mhJOms9-F7PI-dxrJ5IwBBDYB7XR4CofRg__" alt="Play Store" class="playstore-icon">
+            DOWNLOAD NOW
+        </button>
+    </div>
+</div>
+</div>
+
+<script>
+// These are the image paths you'll need to update with your actual image files
+const CARD_IMAGES = {
+    // Batting cards
+    coverdrive: 'https://media-hosting.imagekit.io/60ab4fd8b1dc42df/coverdrive.png?Expires=1838021542&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=u0R8KPFBf9ODrzMguy1BHUa-~YesEnzg9dJX7acRykGRXyuNtU7wbGuEDTjzPVYT8~faEJfy5fq5PLnEtv4hXBrpFsoFV~gHHFNj8dW7jUiwasvHkvqA58ZNjtarEFUaQNXpZ8AAeybZFfNArOCTLk7n8ti~yJ9navBL7-rw0v3zTE-CVyfs6IRYgjwZOiBfiyH6ZWQI8y8-whQATo4CXl-u03PRAQR5wJH2Qpr5copYWE0iP~YLSc-OLIvl7g7akZvcIJ7x4qnBfGAKeiKbb2QPPo-NXtRVUlQ38CZOXCiyVB610LNeU0rUEqGmtKADhKInHL-5xnLopEe5kebG2Q__',
+    legglance: 'https://media-hosting.imagekit.io/b51985d705ca466b/legglance.png?Expires=1838021659&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=KKNK0t0l5e1m0KB0Wd~f3XmOmyTspnNBMHaLEIYe1-0pogXlUrwpD2b4nM-FFUuy5zfZKYPNEDlJZc0w5AJQZh-EEyZ48FFYtreKR2TbQhkTv3V74hZ8HyHxTvCDxSs~E7lVnHSObTAHkDrSvhaasNVCAAdMTe~9zXoRBYXWgrJVyGek1zzd-yg6GUmv2vg~bFazqfkSIsobkiGOu64iIBMb~D4LO94acP1oF0VTcNPEMvrEp33sGAEimiCf8uoh07p51AMrS4GlieIU-s9TNWydWnO6RD86AJRLRmkKC6z-l96ZbPxfpKl1~HIPdhKAsKXj8spSHDmtCyVRVHB3Ww__',
+    straightdrive: 'https://media-hosting.imagekit.io/e5af47c0b4c14cdb/straightdrive.png?Expires=1838021724&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=B3Tq3PdH22QyOStrgOSbZ46-r5VFhJQjh9l4SIb2YKm--10JftHimJtAPULOF~RbRz0qW4WX--LgdgIPBao5cTDa22RtxvZ~K33zbSzTIgBVo6oLO25pwtD397Tsu4J04jR2W1i1yS~f7lyN1J5czfQZr7-3rse9g8MCX2ZWVmsjbE9eHYoDKRiZB0f9hqGgrem9A2fLxpFyO0lugigd2T~qF3pFLo3Unw-xFjB2RGVldlGtaY6V9349BF0iXddvqJDDWQK4zZ7MzLmoYxn2HJysYIje8RCI12LD6YnoCEjN9QOuL1H7T-ZeVlRK1XeBypIy0ZKwby3kfpQW~1B~1w__',
+    sweep: 'https://media-hosting.imagekit.io/e16158743aaa4bcc/sweep.png?Expires=1838021782&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=tc6VWVe5gDE1se4G4M5Ptgr96Lz6730rcaPjL~Skw6CqGZb-p38CRt0k7nbHQA-NfcQTzBbgMJB9nG71y8rved01F75Peht0RnN8JzTXhz4tyDagHJLAJTKuAYFCbV7W5QSZqxlAkM~IlBo1-ACfhoDGbTECnS7pOfufKVd~gQQpzlurrxMWS5YOza47MFya6RuO5J1hMJ555ZUnK5aXxiB0JJQV12K-yWgXMyEY53TvBIRUnIRUc6sgQP2dOWCxPeIZWAOtAQ7oyRkirUrIxADHjfGdW~imdMItNL7Dk3gkuW0Map99wkca7nPVT~3pr6ZkKEkDWnDQs4XA2P3OjQ__',
+    pull: 'https://media-hosting.imagekit.io/7d0a60b99a8e4f94/pull.png?Expires=1838021875&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=vI3zAe-bFBlO2C5RY5V-mC3IEGU9lIb1EbgpTIUhcLwH3ipCFbH3rdLAXzMmN2sfzHRpZRoGMR2xIoak-1H4edkjwpDwTIyYttj8fbMWP3HhU3tOLmgcB9v23W641YzREPIBKA54SOLemI-7DZxs8w-NgzgvyoQlmW3u9xcThbY93nm61Mcp0j4-mIVZAVIH5AZwWMDE8Nc596RaOzbTerxG1sGlA7VN2SJSLco8VF3BVDYBFCmrU-DjUd19ED~FEw4X3ZdV-4cpkUkIhbJrXfuON7d7uBPNwRrHBlK0sBATptv2O0w1pAT6Ulz-Q~ol4jWZzBfiH6Hf8EJQsnGemQ__',
+    scoop: 'https://media-hosting.imagekit.io/198005a97b7c4c78/scoop.png?Expires=1838021960&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=tlPDj9RryShKrAukr32zIMC7r3DCQQjQYDBIJvOH5nsIRM2CZogdFModb1q4ynaLp0tUZDiJamuvuSMUsZjijVREhcUt0DKtrmMuoWwiwXcnW2nc-7BTBDM1qHiKzcsNzMnLMiazfcJ0-OjzgXbznnhApKF30KCrSy7bEfll2xHcVSs7eM8Ot2dFGKrqEt5zWs9sswuTew9RQPffaJNeZFs1BbrMjeO9jhB0Q1N2VRLCb45fBkQaZvWSp62KyvZ8UfVf3SH9dJAf0Cvr6FenE0DojOlZ5-cabYlyxNE2QYk01xQkhb9RAdT5~Kc8NBhaAza~99TgxOE0uJomrw4O1Q__',
+
+    // Bowling cards
+    yorker: 'https://media-hosting.imagekit.io/1e18aa4cd22747ee/yorker.png?Expires=1838023030&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=XX67cyBSJctKcf~JLnSsFComxwcp9mbkE~~ZAcOFQNgsuZZvymJ70s2Qx28nwovsybsfl7Cd6ohx~Y3OnVFXOIFSH~f2GNhih-ru9yLBdFxKtOoHcTPDFQFt1n1Y2OmkRqhtvJ~XqleK9tw3I2ocIpFOJJ8dC8IBXRvcn7E6g94WwkQ-Z8aUrgW10Rm-1vOIJt0WOe2VuXEGzGpN3N7gVU2YfJ6lGcTxfpTgo~B1KSkErlNPDI2P6NoDLcV-atfzYMssVFvuFFyUCzAHCxK9-TMOGrTgwozqoLdlGrGGkk2SY08lFzDOhProgr7K1jmZ2ZeNkmcpKh8i82qM~p-i9A__',
+    bouncer: 'https://media-hosting.imagekit.io/9cbbae0b776b4925/bouncer.png?Expires=1838022999&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=d~-kx0ptE8VVC2N1fRIU0XVFpXTjn~7xyJzNAY2FW2Vl2Ch81xwOoTyyjy785c~7bpQtoHT8pNZ8F-Z6-1qmMwkv~Z4~SEN8jW8HFmNFSZJf7X9ThMkt5-UhcIKKZwkz4b0i11aszq9YudhrMvRbKnk4ZsRUWWtc2gz~7XHCC7hQOthZyLxdCLleflzyHp4WqbE85EhOEt-JFlmVhVRolS86S3aPoPclGuN18cPt9coagPm3Cr~5D-PFowObeiPurLrrzyYJqvjuwtGPerY3apDWSUVicP8xhFxO1ln4UMSrQDGJhiVTQ6NNIJA97F7pG3T06YQ9a3L3U9XtewquOw__',
+    inswinger: 'https://media-hosting.imagekit.io/6c08b172062b4733/inswinger.png?Expires=1838023073&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=OdKQkecT3OJtNZgdDgN3K2hZO9mN-F0IC~3nSGHU0bCwK~QYgrFJ4VXHM2GdV8ZybVC~TJkdgHsguaIkfQCMf0A6Y9ZnDsiLgKPU1qqEVjaVISnRXGVf2k3a5osxnWojbvNDHp3Je-jMqZTyU-z~8sI7aBuRVDDIcbkWSagRdk3~FQeCY8Un-USndcnaCLvUUTx0JX9Cn7Btlf99oSarykahcNKJUYlWLz-7RgOZEQ40qU5owZCmKTiaIb3H04mCRdRPowziyJ8Uq5xCjDPjFdDQaKUQmamA89pxmggOAGt41nQY6IeunRa09feruF6WpaUxv4q9Bt6Wkwzqtn3kEA__',
+    outswinger: 'https://media-hosting.imagekit.io/908277aa7b6c4119/outswinger.png?Expires=1838023059&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=OKXlmONPbV928jcUmJ8G-9dtWuinRuHh9869W7Nf~gCQ7tcXOVHk69-mxXAZQEk5vTkX~uB0gooYWLCIHvJt621cSj0VZ3icAwWC20BbFW1P3P8xgXIcJVk0od8dr2cPx2hEqjkKISWSJG5QmpIgAlMlLk2ys2O3Bq3YiNrEbgEEpHsxeWF1TAZ8rsiZ~EAkJEnfMHG1KdVBB4CeTxmKBlhyBsOg67YcVTDmZJKgZP2y2MK829b9RbrhLSF4QCl-G~aCr0LUhdgrtey47G9pEQ7u~4z~D2G~A0uwfNnfAii-0~KV1Ld7pGGoPElWiH8adMSdAIT06xmdtUPC683c8A__',
+    legcutter: 'https://media-hosting.imagekit.io/a17f37db97d3444c/legcutter.png?Expires=1838023079&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=Q3CK9A-rhfFOBdyAo6~3S6YZcie9~mc1ix1zgdhxLnbxq2DucKXNIDzKmL8HP2uRPLBZPcZ2rNTARN-MVMlit0NuZUVLPzvaeWEOjNEThSmtjrylH8yv1B0XoXeok1flj~zQBQuFi7npU~mYeVeLRV-daYGX87pTIt~i22YCmWcw0qVLcDwL2~-KuMnN-pIWs2G8GWWcIpJ-Qgu8TSWkVtwBqzzAQwt0pL0-upS3pA~XkxCpOE2X~n-v7~0uYf3GEP-V4mkT3nKzGqEbWHvmHDfcWED-y~zxvm5N2WzlVdqPfNx520~BGD~giV95hvGZy0pnGhdtWzjk~feW6pzyRg__',
+    offcutter: 'https://media-hosting.imagekit.io/c89d42e1d8ac4973/offcutter.png?Expires=1838023053&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=O6RsRV6ZBW-9IAoD-IsejLYQZ7tAgf-xtyXGmrCeEz71MfwT7fX~rhz0LJPW9CCwFib6aN6Axu8bDRL0yysdDac9DSmIBv5B~xtOe4AmGz3t0DTPYspvVXGsjVgCKyF0nnthM9SHhkmCVPF4Pvx0oDzFFq9MTGOOHB1i0J4mx01cnHIWnOBhsMWXD5UvtuDQ5VViMyQxApNE~u4rFUKCHQGbEnOo~OcVw78-hljVKVh~rYCyE2Nev~k25Gh4Ldlbmwvdxi5iRQaJx12ig-JVHyNEWJae1YFc55uAehooA6F2rqEReQjKJ-MSKRwZ7UD3fQ2Ece0QJwyteRcgnjroiA__'
+};
+
+// Game Data
+const bowlingCards = [
+    { id: 'bouncer', name: 'Bouncer' },
+    { id: 'yorker', name: 'Yorker' },
+    { id: 'inswinger', name: 'Inswinger' },
+    { id: 'outswinger', name: 'Outswinger' },
+    { id: 'legcutter', name: 'Leg Cutter' },
+    { id: 'offcutter', name: 'Off Cutter' }
+];
+
+const battingCards = [
+    { id: 'coverdrive', name: 'Cover Drive', color: '#3182ce' },
+    { id: 'legglance', name: 'Leg Glance', color: '#e53e3e' },
+    { id: 'straightdrive', name: 'Straight Drive', color: '#38a169' },
+    { id: 'sweep', name: 'Sweep Shot', color: '#805ad5' },
+    { id: 'pull', name: 'Pull Shot', color: '#dd6b20' },
+    { id: 'scoop', name: 'Scoop Shot', color: '#6b46c1' }
+];
+
+// Score outcomes based on batting card vs bowling card
+const outcomes = {
+    coverdrive: { bouncer: -1, yorker: 0, inswinger: 4, outswinger: 2, legcutter: 3, offcutter: 6 },
+    legglance: { bouncer: -1, yorker: 0, inswinger: 2, outswinger: 6, legcutter: 4, offcutter: 3 },
+    straightdrive: { bouncer: 0, yorker: 4, inswinger: -1, outswinger: 3, legcutter: 2, offcutter: 1 },
+    sweep: { bouncer: -1, yorker: 2, inswinger: -1, outswinger: 0, legcutter: 4, offcutter: 6 },
+    pull: { bouncer: 3, yorker: -1, inswinger: 0, outswinger: 0, legcutter: 1, offcutter: 4 },
+    scoop: { bouncer: -1, yorker: 4, inswinger: 1, outswinger: 1, legcutter: 0, offcutter: 0 }
+};
+
+// Set game constants
+let score = 0;
+let target = 9;  // Target to defend
+let ballsLeft = 3;  // 3 balls to play
+let currentBattingCard = null;
+let userCards = [];
+let isCardSelectionEnabled = true;
+
+const gameContainer = document.getElementById('game-container'); // Get the main container
+// const introScreen = document.getElementById('intro-screen'); // <<< Removed reference
+const tutorialScreen = document.getElementById('tutorial-screen');
+const gameplayScreen = document.getElementById('gameplay-screen');
+const resultScreen = document.getElementById('result-screen');
+
+// const playBtn = document.getElementById('play-btn'); // <<< Removed reference
+const skipTutorialBtn = document.getElementById('skip-tutorial-btn');
+const startGameBtn = document.getElementById('start-game-btn');
+const downloadBtn = document.getElementById('download-btn');
+const closeAdBtn = document.getElementById('close-ad-btn'); // Get the new close button
+
+const targetValue = document.getElementById('target-value');
+const scoreValue = document.getElementById('score-value');
+const ballsValue = document.getElementById('balls-value');
+
+const bowlingCardElement = document.getElementById('bowling-card');
+const battingCardsContainer = document.getElementById('batting-cards-container');
+
+const animationOverlay = document.getElementById('animation-overlay');
+const animationText = document.getElementById('animation-text');
+
+// Functions
+function showScreen(screen) {
+    document.querySelectorAll('.screen').forEach(s => {
+        s.classList.remove('active');
+    });
+    screen.classList.add('active');
+}
+
+function startGame() {
+    score = 0;
+    ballsLeft = 3;
+    updateStats();
+
+    document.querySelector('.bowling-card-title').textContent = "Opponent's Shot";
+    document.querySelector('.batting-cards-title').textContent = "Your Bowling Cards";
+
+    dealUserCards();
+    nextBall();
+
+    showScreen(gameplayScreen);
+}
+
+function dealUserCards() {
+    battingCardsContainer.innerHTML = '';
+    userCards = [...bowlingCards]; // Give the player all 6 bowling cards
+
+    userCards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card';
+        cardElement.dataset.cardId = card.id;
+
+        const imageSpace = document.createElement('div');
+        imageSpace.className = 'card-image';
+        imageSpace.style.backgroundImage = `url('${CARD_IMAGES[card.id]}')`;
+        imageSpace.style.backgroundSize = 'contain'; // Ensure image fits properly
+        imageSpace.style.backgroundColor = '#0c2654'; // Add dark blue background
+        imageSpace.style.height = '100%'; // Make image fill the entire card
+
+        cardElement.appendChild(imageSpace);
+
+        cardElement.addEventListener('click', () => {
+            if (isCardSelectionEnabled) {
+                playCard(card, cardElement);
+            }
+        });
+
+        battingCardsContainer.appendChild(cardElement);
+    });
+}
+
+function nextBall() {
+    if (ballsLeft > 0) {
+        const randomIndex = Math.floor(Math.random() * battingCards.length);
+        currentBattingCard = battingCards[randomIndex];
+
+        bowlingCardElement.innerHTML = '';
+        bowlingCardElement.style.width = '140px';
+        bowlingCardElement.style.height = '200px';
+        bowlingCardElement.style.backgroundColor = '#0c2654';
+        bowlingCardElement.style.margin = '0 auto';
+        bowlingCardElement.style.borderRadius = '8px';
+        bowlingCardElement.style.overflow = 'hidden';
+        bowlingCardElement.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+        bowlingCardElement.style.border = '2px solid rgba(255, 255, 255, 0.2)';
+
+        const imageSpace = document.createElement('div');
+        imageSpace.style.width = '100%';
+        imageSpace.style.height = '180px';
+        imageSpace.style.margin = '10px 0';
+        imageSpace.style.backgroundImage = `url('${CARD_IMAGES[currentBattingCard.id]}')`;
+        imageSpace.style.backgroundSize = 'contain';
+        imageSpace.style.backgroundPosition = 'center';
+        imageSpace.style.backgroundRepeat = 'no-repeat';
+
+        bowlingCardElement.appendChild(imageSpace);
+        isCardSelectionEnabled = true;
+    } else {
+        endGame();
+    }
+}
+
+function playCard(card, cardElement) {
+    isCardSelectionEnabled = false;
+    ballsLeft--;
+    updateStats();
+
+    const outcome = outcomes[currentBattingCard.id][card.id];
+
+    if (outcome === -1) {
+        showAnimation('OUT!', 'rgba(34, 197, 94, 0.8)');
+    } else if (outcome >= 4) {
+        showAnimation(outcome + ' RUNS!', 'rgba(220, 38, 38, 0.8)');
+        score += outcome;
+    } else if (outcome > 0) {
+        showAnimation(outcome + ' RUN' + (outcome > 1 ? 'S!' : '!'), 'rgba(234, 179, 8, 0.8)');
+        score += outcome;
+    } else {
+        showAnimation('DOT BALL!', 'rgba(34, 197, 94, 0.8)');
+    }
+
+    updateStats();
+
+    setTimeout(() => {
+        cardElement.style.opacity = '0.5';
+        cardElement.style.pointerEvents = 'none';
+
+        if (outcome === -1 || score >= target) {
+             if (ballsLeft === 0 && score < target) {
+                endGame(); // Player wins if balls run out and target not reached
+            } else {
+                endGame(); // Game ends if OUT or target reached before balls run out
+            }
+        } else if (ballsLeft === 0) {
+             endGame(); // Game ends if balls run out
+        } else {
+            nextBall(); // Continue to next ball
+        }
+    }, 1500);
+}
+
+
+function showAnimation(text, backgroundColor) {
+    animationText.textContent = text;
+    animationOverlay.style.backgroundColor = backgroundColor;
+    animationOverlay.style.opacity = '1';
+
+    setTimeout(() => {
+        animationOverlay.style.opacity = '0';
+    }, 1200);
+}
+
+function updateStats() {
+    scoreValue.textContent = score;
+    ballsValue.textContent = ballsLeft;
+    targetValue.textContent = target;
+}
+
+function endGame() {
+    setTimeout(() => {
+        let resultMessage = '';
+
+        if (score >= target) {
+            resultMessage = `TARGET REACHED! Opponent scored ${score} runs. Better luck next time! Download to practice!`;
+        } else {
+             resultMessage = `VICTORY! You restricted opponent to ${score} runs. Download for the full experience!`;
+        }
+
+        document.getElementById('result-message').textContent = resultMessage;
+        showScreen(resultScreen);
+    }, 500); // Slightly reduced delay
+}
+
+
+// Event handlers
+// playBtn.addEventListener('click', () => { // <<< Removed listener
+//     showScreen(tutorialScreen);
+// });
+
+skipTutorialBtn.addEventListener('click', () => {
+    startGame();
+});
+
+startGameBtn.addEventListener('click', () => {
+    startGame();
+});
+
+downloadBtn.addEventListener('click', () => {
+    window.open('https://play.google.com/store/apps/details?id=com.golivegames.cricketchampions2025', '_blank');
+});
+
+closeAdBtn.addEventListener('click', () => {
+    gameContainer.style.display = 'none'; // Hide the entire game container
+});
+
+// <<< Updated to show tutorial screen first >>>
+showScreen(tutorialScreen);
+</script>
+</body>
+</html>
